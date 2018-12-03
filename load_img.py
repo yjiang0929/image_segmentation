@@ -173,11 +173,14 @@ class ImageLoader():
         sigma = 100
         adj_matrix = init_graph(self.img, k, sigma, self.fg_pixels, self.bg_pixels)
 
+        print("Adjacency matrix generated")
+
         m, n = self.image.shape[0], self.image.shape[1]
         source = m*n + 1
         sink = m*n + 2
 
         g = Graph(adj_matrix)
+        print("Graph generated, running mincut")
         g.minCut(source, sink)
 
 if __name__ == "__main__":
