@@ -4,7 +4,7 @@ class Graph:
     def __init__(self,graph):
         self.graph = graph # residual graph
         self.org_graph = [i[:] for i in graph]
-        self. ROW = len(graph)
+        self.ROW = len(graph)
         self.COL = len(graph[0])
 
 
