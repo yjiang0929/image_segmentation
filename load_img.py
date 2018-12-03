@@ -146,7 +146,7 @@ class ImageLoader():
                          (self.bg_temp[1][0],self.bg_temp[1][1]),(0,255,0), 2)
 
     def load_img(self):
-        self.img = cv2.imread(self.filename)
+        self.img = cv2.imread(self.filename,0)
         cv2.namedWindow('image')
         cv2.setMouseCallback("image", self.on_mouse, 0)
         # Update the display with lines
