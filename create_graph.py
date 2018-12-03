@@ -3,11 +3,10 @@ import numpy
 from PIL import Image
 import cv2
 
-def init_graph(file, k, sigma, F_Pixels, B_Pixels):
+def init_graph(img_array, k, sigma, F_Pixels, B_Pixels):
     # k = similar pixels have weight close to kappa
     # Sigma value --> determines how fast the values decay towards zero with increasing dissimilarity.
-    I = (Image.open(file).convert('L')) # read image, convert to greyscale
-    I, F_Pixels, B_Pixels = array(I), array(F_Pixels), array(B_Pixels) # convert images to numpy arrays
+    I, F_Pixels, B_Pixels = array(img_array), array(F_Pixels), array(B_Pixels) # convert images to numpy arrays
     #Taking the mean of the histogram
     Ibmean = mean(cv2.calcHist([B_Pixels],[0],None,[256],[0,256]))
     Ifmean = mean(cv2.calcHist([F_Pixels],[0],None,[256],[0,256]))
