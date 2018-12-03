@@ -1,6 +1,5 @@
 from numpy import *
 import numpy
-from PIL import Image
 import cv2
 
 def init_graph(img_array, k, sigma, F_Pixels, B_Pixels):
@@ -24,10 +23,10 @@ def init_graph(img_array, k, sigma, F_Pixels, B_Pixels):
         Im[i] = Im[i] / linalg.norm(Im[i]) # normalizing the input image vector
 
     # define graph
-    g = zeros(n*m+2, n*m+2) # graph represented as an adjacency matrix
-    source = m*n + 1
-    sink = m*n + 2
-
+    g = zeros((n*m+2, n*m+2)) # graph represented as an adjacency matrix
+    source = m*n
+    sink = m*n+1
+    print(source, sink)
     # computer likelihoods
     '''
     Explaination of the likelihood function: * used Bayes’ theorem for conditional probabilities
