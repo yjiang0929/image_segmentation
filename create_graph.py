@@ -3,12 +3,12 @@ import numpy
 from PIL import Image
 import cv2
 
-def init_graph(file, kappa, sigma, F_Pixels, B_Pixels):
+def init_graph(file, k, sigma, F_Pixels, B_Pixels):
     I = (Image.open(file).convert('L')) # read image, convert to greyscale
     I, F_Pixels, B_Pixels = array(I), array(F_Pixels), array(B_Pixels) # convert images to numpy arrays
     #Taking the mean of the histogram
-    Ibmean = mean(cv2.calcHist([Ib],[0],None,[256],[0,256]))
-    Ifmean = mean(cv2.calcHist([If],[0],None,[256],[0,256]))
+    Ibmean = mean(cv2.calcHist([B_Pixels],[0],None,[256],[0,256]))
+    Ifmean = mean(cv2.calcHist([F_Pixels],[0],None,[256],[0,256]))
     #initalizing the foreground/background probability vector
     F = ones(shape = I.shape)
     B = ones(shape = I.shape)
@@ -22,43 +22,44 @@ def init_graph(file, kappa, sigma, F_Pixels, B_Pixels):
     for i in range(Im.shape[0]):
         Im[i] = Im[i] / linalg.norm(Im[i]) # normalizing the input image vector
 
-    g = np.array([[inf, 0, 0],
-                  [inf, 0, 0],
-                  [inf, 0, 0]
-                 ])
-    source = 0
-    sink = m*n + 1
+    # define graph
+    g = zeros(n*m+2, n*m+2) # graph represented as an adjacency matrix
+    source = m*n + 1
+    sink = m*n + 2
 
-    for i in range(m*n):#checking the 4-neighborhood pixels
-        ws=(F[i]/(F[i]+B[i])) # source weight
-        wt=(B[i]/(F[i]+B[i])) # sink weight
-        g.add_tedge(i,ws[0],wt) # edges between pixels and terminal
+    # computer likelihoods
+    '''
+    Explaination of the likelihood function: * used Bayes’ theorem for conditional probabilities
+    * The function is constructed by multiplying the individual conditional probabilities of a pixel being either
+    foreground or background in order to get the total probability. Then the class with highest probability is selected.
+    * for a pixel i in the image:
+                       * weight from sink to i:
+                       probabilty of i being background/sum of probabilities
+                       * weight from source to i:
+                       probabilty of i being foreground/sum of probabilities
+                       * weight from i to a 4-neighbourhood pixel:
+                        K * e−|Ii−Ij |2 / s
+                         where k and s are parameters that determine hwo close the neighboring pixels are how fast the values
+                         decay towards zero with increasing dissimilarity
+    '''
+
+    for i in range(0, n*m):#checking the 4-neighborhood pixels
+        g[source][i]=(F[i]/(F[i]+B[i])) # source weight
+        g[i][sink]=(B[i]/(F[i]+B[i])) # sink weight
+
+        # four neighboring pixels
         if i%n != 0: # for left pixels
-            w = k*exp(-(abs(Im[i]-Im[i-1])**2)/s) # the cost function for two pixels
-            g.add_edge(i,i-1,w[0],k-w[0]) # edges between two pixels
-            '''Explaination of the likelihood function: * used Bayes’ theorem for conditional probabilities
-            * The function is constructed by multiplying the individual conditional probabilities of a pixel being either
-            foreground or background in order to get the total probability. Then the class with highest probability is selected.
-            * for a pixel i in the image:
-                               * weight from sink to i:
-                               probabilty of i being background/sum of probabilities
-                               * weight from source to i:
-                               probabilty of i being foreground/sum of probabilities
-                               * weight from i to a 4-neighbourhood pixel:
-                                K * e−|Ii−Ij |2 / s
-                                 where k and s are parameters that determine hwo close the neighboring pixels are how fast the values
-                                 decay towards zero with increasing dissimilarity
-            '''
+            w = k*exp(-(abs(Im[i]-Im[i-1])**2)/sigma) # the cost function for two pixels
+            g[i][i-1] = w # edges between two pixels
         if (i+1)%n != 0: # for right pixels
-            w = k*exp(-(abs(Im[i]-Im[i+1])**2)/s)
-            g.add_edge(i,i+1,w[0],k-w[0]) # edges between two pixels
+            w = k*exp(-(abs(Im[i]-Im[i+1])**2)/sigma)
+            g[i][i+1] = w
         if i//n != 0: # for top pixels
-            w = k*exp(-(abs(Im[i]-Im[i-n])**2)/s)
-            g.add_edge(i,i-n,w[0],k-w[0]) # edges between two pixels
+            w = k*exp(-(abs(Im[i]-Im[i-n])**2)/sigma)
+            g[i-n][i] = w
         if i//n != m-1: # for bottom pixels
-            w = k*exp(-(abs(Im[i]-Im[i+n])**2)/s)
-            g.add_edge(i,i+n,w[0],k-w[0]) # edges between two pixels
-
+            w = k*exp(-(abs(Im[i]-Im[i+n])**2)/sigma)
+            g[i+n][i] = w
 
     ## graph is 2d list of lists, not np array
     return g.tolist()
