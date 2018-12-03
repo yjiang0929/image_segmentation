@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 from argparse import ArgumentParser
 
+from min_cut import Graph
+from create_graph import init_graph
+
 class ImageLoader():
     def __init__(self):
         # initialize parser for arguments
@@ -18,7 +21,7 @@ class ImageLoader():
         self.mouse_down = False
         self.is_foreground = True
 
-        self.load_img()
+        self.run()
 
     def build_parser(self):
         # build parser for loading the filename
@@ -162,6 +165,20 @@ class ImageLoader():
 
         print('Number of foreground pixels: ', np.shape(self.fg_pixels))
         print('Number of background pixels: ', np.shape(self.bg_pixels))
+
+    def run(self):
+        self.load_img()
+
+        k = 2
+        sigma = 100
+        adj_matrix = init_graph(self.img, k, sigma, self.fg_pixels, self.bg_pixels)
+
+        m, n = self.image.shape[0], self.image.shape[1]
+        source = m*n + 1
+        sink = m*n + 2
+
+        g = Graph(adj_matrix)
+        g.minCut(source, sink)
 
 if __name__ == "__main__":
     imgLoader = ImageLoader()

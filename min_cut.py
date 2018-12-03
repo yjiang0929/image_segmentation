@@ -90,17 +90,17 @@ class Graph:
         print(S)
         print(T)
 
+if __name__ == "__main__":
+    # Create a graph given in the above diagram
+    graph = [[0, 16, 13, 0, 0, 0],
+            [0, 0, 10, 12, 0, 0],
+            [0, 4, 0, 0, 14, 0],
+            [0, 0, 9, 0, 0, 20],
+            [0, 0, 0, 7, 0, 4],
+            [0, 0, 0, 0, 0, 0]]
 
-# Create a graph given in the above diagram
-graph = [[0, 16, 13, 0, 0, 0],
-        [0, 0, 10, 12, 0, 0],
-        [0, 4, 0, 0, 14, 0],
-        [0, 0, 9, 0, 0, 20],
-        [0, 0, 0, 7, 0, 4],
-        [0, 0, 0, 0, 0, 0]]
+    g = Graph(graph)
 
-g = Graph(graph)
+    source = 0; sink = 5
 
-source = 0; sink = 5
-
-g.minCut(source, sink)
+    g.minCut(source, sink)
