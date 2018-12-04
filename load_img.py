@@ -1,4 +1,5 @@
 import cv2
+from copy import deepcopy
 import numpy as np
 from argparse import ArgumentParser
 
@@ -12,6 +13,7 @@ class ImageLoader():
         options = parser.parse_args()
         self.filename = options.filename
         self.img = []
+        self.original = []
 
         # variables for labeling foreground and background
         self.fg_temp = np.empty((2,2), np.int32)
@@ -128,6 +130,7 @@ class ImageLoader():
                 if len(self.fg_pixels)>0:
                     self.fg_pixels = np.append(self.fg_pixels, self.createLineIterator(), axis=0)
                 else:
+                    print(self.createLineIterator)
                     self.fg_pixels = np.array(self.createLineIterator())
 
                 # draw the lines on the image
@@ -147,6 +150,7 @@ class ImageLoader():
 
     def load_img(self):
         self.img = cv2.imread(self.filename,0)
+        self.original = deepcopy(self.img)
         cv2.namedWindow('image')
         cv2.setMouseCallback("image", self.on_mouse, 0)
         # Update the display with lines
@@ -170,11 +174,11 @@ class ImageLoader():
         self.load_img()
         print(np.shape(self.img))
         k = 2
-        sigma = 100
-        adj_matrix = init_graph(self.img, k, sigma, self.fg_pixels, self.bg_pixels)
+        sigma = 10
+        adj_matrix = init_graph(self.original, k, sigma, self.fg_pixels, self.bg_pixels)
 
         print("Adjacency matrix generated")
-        print(adj_matrix)
+        # print(adj_matrix)
 
         m, n = self.img.shape[0], self.img.shape[1]
         source = m*n

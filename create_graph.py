@@ -6,9 +6,15 @@ def init_graph(img_array, k, sigma, F_Pixels, B_Pixels):
     # k = similar pixels have weight close to kappa
     # Sigma value --> determines how fast the values decay towards zero with increasing dissimilarity.
     I, F_Pixels, B_Pixels = array(img_array), array(F_Pixels), array(B_Pixels) # convert images to numpy arrays
+    print(img_array)
+    print(F_Pixels)
+    print(B_Pixels)
     #Taking the mean of the histogram
     Ibmean = mean(cv2.calcHist([B_Pixels],[0],None,[256],[0,256]))
     Ifmean = mean(cv2.calcHist([F_Pixels],[0],None,[256],[0,256]))
+    print(cv2.calcHist([F_Pixels],[0],None,[256],[0,256]))
+    print(Ibmean)
+    print(Ifmean)
     #initalizing the foreground/background probability vector
     F = ones(shape = I.shape)
     B = ones(shape = I.shape)
@@ -18,6 +24,9 @@ def init_graph(img_array, k, sigma, F_Pixels, B_Pixels):
         for j in range(I.shape[1]):
             F[i,j] = -log(abs(I[i,j] - Ifmean)/(abs(I[i,j] - Ifmean)+abs(I[i,j] - Ibmean))) # Probability of a pixel being foreground
             B[i,j] = -log(abs(I[i,j] - Ibmean)/(abs(I[i,j] - Ibmean)+abs(I[i,j] - Ifmean))) # Probability of a pixel being background
+    print("F and B")
+    print(F)
+    print(B)
     F,B = F.reshape(-1,1),B.reshape(-1,1) # convertingb  to column vector for ease
     for i in range(Im.shape[0]):
         Im[i] = Im[i] / linalg.norm(Im[i]) # normalizing the input image vector
