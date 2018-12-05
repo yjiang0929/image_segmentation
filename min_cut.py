@@ -77,13 +77,7 @@ class Graph:
                 self.graph[u][v] -= path_flow
                 self.graph[v][u] += path_flow
                 v = parent[v]
-
-        # # print the edges which initially had weights
-        # # but now have 0 weight
-        # for i in range(self.ROW):
-        #     for j in range(self.COL):
-        #         if self.graph[i][j] == 0 and self.org_graph[i][j] > 0:
-        #             print(str(i) + " - " + str(j))
+        print("finish first half")
 
         # print the partition of the vertices
         S = []
@@ -95,6 +89,8 @@ class Graph:
                 T.append(i)
         print(S)
         print(T)
+        print("  ")
+        return S,T
 
 if __name__ == "__main__":
     # Create a graph given in the above diagram

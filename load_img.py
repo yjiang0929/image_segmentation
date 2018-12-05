@@ -4,7 +4,8 @@ import numpy as np
 from argparse import ArgumentParser
 
 from min_cut import Graph
-from create_graph import init_graph
+# from create_graph import init_graph
+from gaussian_graph import init_graph
 
 class ImageLoader():
     def __init__(self):
@@ -130,7 +131,6 @@ class ImageLoader():
                 if len(self.fg_pixels)>0:
                     self.fg_pixels = np.append(self.fg_pixels, self.createLineIterator(), axis=0)
                 else:
-                    print(self.createLineIterator)
                     self.fg_pixels = np.array(self.createLineIterator())
 
                 # draw the lines on the image
@@ -149,7 +149,8 @@ class ImageLoader():
                          (self.bg_temp[1][0],self.bg_temp[1][1]),(0,255,0), 2)
 
     def load_img(self):
-        self.img = cv2.imread(self.filename,0)
+        # self.img = cv2.imread(self.filename,0)
+        self.img = cv2.imread(self.filename)
         self.original = deepcopy(self.img)
         cv2.namedWindow('image')
         cv2.setMouseCallback("image", self.on_mouse, 0)
@@ -173,8 +174,8 @@ class ImageLoader():
     def run(self):
         self.load_img()
         print(np.shape(self.img))
-        k = 2
-        sigma = 10
+        k = 1
+        sigma = 100
         adj_matrix = init_graph(self.original, k, sigma, self.fg_pixels, self.bg_pixels)
 
         print("Adjacency matrix generated")
@@ -186,7 +187,25 @@ class ImageLoader():
 
         g = Graph(adj_matrix)
         print("Graph generated, running mincut")
-        g.minCut(source, sink)
+        S, T = g.minCut(source, sink)
+
+        # generate foreground mask
+        fore_mask = np.zeros((m,n), np.uint8)
+        print(fore_mask.shape)
+        print(self.original.shape)
+        for pixel in T:
+            if pixel < m*n:
+                row = pixel // m
+                col = pixel % m
+                fore_mask[row][col] = 1
+
+        masked_img = cv2.bitwise_and(self.original, self.original, mask=fore_mask)
+        while 1:
+            cv2.imshow("masked", masked_img)
+            k = cv2.waitKey(5) & 0xFF
+            if k==27:
+                break
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     imgLoader = ImageLoader()

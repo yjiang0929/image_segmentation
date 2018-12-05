@@ -18,7 +18,7 @@ stretched_gaussian = np.dot(np.random.randn(n_samples, 2), C)
 # concatenate the two datasets into the final training set
 # X_train = np.vstack([shifted_gaussian, stretched_gaussian])
 X_train = np.vstack([stretched_gaussian, shifted_gaussian])
-
+print(X_train)
 # fit a Gaussian Mixture Model with two components
 clf = mixture.GaussianMixture(n_components=2, covariance_type='full')
 clf.fit(X_train)
