@@ -192,20 +192,19 @@ class ImageLoader():
         # S, T = g.minCut(source, sink)
 
         # generate foreground mask
-        fore_mask = np.zeros((m,n), np.uint8)
+        back_mask = np.zeros((m,n), np.uint8)
         for i,p in enumerate(segments):
-                if p:
-                    row = i // m
-                    col = i % m
-                    fore_mask[row][col] = 1
-        print(fore_mask)
+            if not p and (i<(m*n)):
+                row = i // n
+                col = i % n
+                back_mask[row][col] = 1
         # for pixel in segments:
         #     if pixel < m*n:
         #         row = pixel // m
         #         col = pixel % m
         #         fore_mask[row][col] = 1
 
-        masked_img = cv2.bitwise_and(self.original, self.original, mask=fore_mask)
+        masked_img = cv2.bitwise_and(self.original, self.original, mask=back_mask)
         while 1:
             cv2.imshow("masked", masked_img)
             k = cv2.waitKey(5) & 0xFF
