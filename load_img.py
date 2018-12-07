@@ -176,7 +176,9 @@ class ImageLoader():
         print(np.shape(self.img))
         k = 1
         sigma = 100
-        adj_matrix = init_graph(self.original, k, sigma, self.fg_pixels, self.bg_pixels)
+
+
+        segments = init_graph(self.original, k, sigma, self.fg_pixels, self.bg_pixels)
 
         print("Adjacency matrix generated")
         # print(adj_matrix)
@@ -185,19 +187,23 @@ class ImageLoader():
         source = m*n
         sink = m*n + 1
 
-        g = Graph(adj_matrix)
-        print("Graph generated, running mincut")
-        S, T = g.minCut(source, sink)
+        # g = Graph(adj_matrix)
+        # print("Graph generated, running mincut")
+        # S, T = g.minCut(source, sink)
 
         # generate foreground mask
         fore_mask = np.zeros((m,n), np.uint8)
-        print(fore_mask.shape)
-        print(self.original.shape)
-        for pixel in T:
-            if pixel < m*n:
-                row = pixel // m
-                col = pixel % m
-                fore_mask[row][col] = 1
+        for i,p in enumerate(segments):
+                if p:
+                    row = i // m
+                    col = i % m
+                    fore_mask[row][col] = 1
+        print(fore_mask)
+        # for pixel in segments:
+        #     if pixel < m*n:
+        #         row = pixel // m
+        #         col = pixel % m
+        #         fore_mask[row][col] = 1
 
         masked_img = cv2.bitwise_and(self.original, self.original, mask=fore_mask)
         while 1:
