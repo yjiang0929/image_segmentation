@@ -181,18 +181,18 @@ class ImageLoader():
         print("Image Segemented")
         # generate foreground mask
         m, n = self.img.shape[0], self.img.shape[1]
-        fore_mask = np.zeros((m,n), np.uint8)
-        for pixel in T:
-            if pixel < m*n:
-                row = pixel // n
-                col = pixel % n
-                fore_mask[row][col] = 1
-
         back_mask = np.zeros((m,n), np.uint8)
-        for pixel in S:
-            if pixel < m*n:
-                row = pixel // n
-                col = pixel % n
+        for i,p in enumerate(segments):
+            if not p and (i<(m*n)):
+                row = i // n
+                col = i % n
+                back_mask[row][col] = 1
+
+        fore_mask = np.zeros((m,n), np.uint8)
+        for i,p in enumerate(segments):
+            if p and (i<(m*n)):
+                row = i // n
+                col = i % n
                 back_mask[row][col] = 1
 
         fore_img = cv2.bitwise_and(self.original, self.original, mask=fore_mask)
