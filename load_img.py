@@ -173,23 +173,14 @@ class ImageLoader():
 
     def run(self):
         self.load_img()
-        print(np.shape(self.img))
+
+        # run image segmentation
         k = 1
         sigma = 100
-        adj_matrix = init_graph(self.original, k, sigma, self.fg_pixels, self.bg_pixels)
-
-        print("Adjacency matrix generated")
-        # print(adj_matrix)
-
-        m, n = self.img.shape[0], self.img.shape[1]
-        source = m*n
-        sink = m*n + 1
-
-        g = Graph(adj_matrix)
-        print("Graph generated, running mincut")
-        S, T = g.minCut(source, sink)
-
+        segments = init_graph(self.original, k, sigma, self.fg_pixels, self.bg_pixels)
+        print("Image Segemented")
         # generate foreground mask
+        m, n = self.img.shape[0], self.img.shape[1]
         fore_mask = np.zeros((m,n), np.uint8)
         for pixel in T:
             if pixel < m*n:
