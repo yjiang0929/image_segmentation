@@ -191,17 +191,24 @@ class ImageLoader():
 
         # generate foreground mask
         fore_mask = np.zeros((m,n), np.uint8)
-        print(fore_mask.shape)
-        print(self.original.shape)
         for pixel in T:
             if pixel < m*n:
-                row = pixel // m
-                col = pixel % m
+                row = pixel // n
+                col = pixel % n
                 fore_mask[row][col] = 1
 
-        masked_img = cv2.bitwise_and(self.original, self.original, mask=fore_mask)
+        back_mask = np.zeros((m,n), np.uint8)
+        for pixel in S:
+            if pixel < m*n:
+                row = pixel // n
+                col = pixel % n
+                back_mask[row][col] = 1
+
+        fore_img = cv2.bitwise_and(self.original, self.original, mask=fore_mask)
+        back_img = cv2.bitwise_and(self.original, self.original, mask=back_mask)
         while 1:
-            cv2.imshow("masked", masked_img)
+            cv2.imshow("fore", fore_img)
+            cv2.imshow("back", back_img)
             k = cv2.waitKey(5) & 0xFF
             if k==27:
                 break
